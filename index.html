@@ -2,96 +2,74 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>GROK AI - Foto Jadi Video</title>
-<script type="module">
-import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client@1.6.2/+esm";
-
-window.generateGrok = async () => {
-  const imgFile = document.getElementById('img').files[0];
-  const prompt = document.getElementById('prompt').value;
-  const status = document.getElementById('status');
-  const video = document.getElementById('video');
-  
-  if(!imgFile){ alert("Upload foto dulu lur!"); return; }
-  if(!prompt){ alert("Tulis prompt dulu, misal: berpelukan, berjalan, lari naik motor"); return; }
-
-  status.innerHTML = "⏳ Lagi nyambung ke mesin Grok pribadi... (30 detik pertama agak lama)";
-  video.style.display='none';
-
-  try {
-    // INI MESIN GRATIS YANG SAMA KAYAK GROK - Wan 2.1 14B
-    // Nanti lu ganti jadi space private lu biar unlimited
-    const client = await Client.connect("Wan-AI/Wan2.1-I2V-14B-480P");
-    
-    status.innerHTML = "🎬 Mesin lagi bikin video... prompt lu: " + prompt + "<br>Tunggu 1-2 menit, jangan tutup HP!";
-    
-    const result = await client.predict("/generate", {
-        image: imgFile,
-        prompt: prompt + ", realistic photo, highly detailed, natural movement, 8k",
-        negative_prompt: "deformed, blurry, extra hands, bad face",
-        num_frames: 81,
-        seed: Math.floor(Math.random()*1000000)
-    });
-
-    console.log(result);
-    if(result.data && result.data[0]){
-        video.src = result.data[0].video.url || result.data[0].url;
-        video.style.display='block';
-        status.innerHTML = "✅ JADI LUR! Video realistik udah jadi!";
-        document.getElementById('download').href = video.src;
-        document.getElementById('download').style.display='block';
-    }
-  } catch(e){
-    status.innerHTML = "❌ Error: " + e.message + "<br>Coba lagi, atau duplicate space jadi private (tutorial di bawah)";
-    console.error(e);
-  }
-}
-</script>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>HugGen - Romantic Video Generator</title>
 <style>
-body{background:#000;color:#fff;font-family:system-ui;padding:16px;max-width:500px;margin:auto}
-.card{background:#1a1a1a;padding:16px;border-radius:16px;border:1px solid #333;margin-top:12px}
-input,textarea,button{width:100%;padding:14px;border-radius:12px;border:none;margin-top:10px;font-size:16px;box-sizing:border-box}
-textarea{background:#222;color:#fff;border:1px solid #333}
-button{background:#fff;color:#000;font-weight:800;cursor:pointer}
-button:active{transform:scale(0.98)}
-#preview{width:100%;border-radius:12px;margin-top:10px;display:none}
-#video{width:100%;border-radius:12px;margin-top:10px}
-.small{color:#888;font-size:12px;margin-top:8px}
+body{background:#0a0a0f;color:#fff;font-family:system-ui;margin:0;padding:0}
+.header{padding:20px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #222}
+.logo{font-size:28px;font-weight:800;color:#ff6ec7;text-shadow:0 0 15px #ff6ec7}
+.tabs{display:flex;gap:10px;padding:15px;overflow:auto}
+.tab{padding:10px 18px;border-radius:12px;background:#1a1a25;color:#ff9ad1;cursor:pointer;white-space:nowrap}
+.tab.active{background:#ff6ec7;color:#000;font-weight:700;box-shadow:0 0 20px #ff6ec7}
+.card{margin:20px;background:#11111a;border:1px dashed #ff6ec7;border-radius:16px;padding:30px;text-align:center;box-shadow:0 0 20px rgba(255,110,199,0.3)}
+input[type=file]{display:none}
+textarea{width:100%;background:#1a1a25;border:1px solid #ff6ec7;border-radius:12px;padding:15px;color:#fff;min-height:90px;margin-top:15px}
+.btn{width:100%;background:#ff6ec7;color:#000;font-weight:800;font-size:20px;padding:16px;border:none;border-radius:14px;margin-top:20px;cursor:pointer;box-shadow:0 0 25px #ff6ec7}
+#log{margin:20px;font-size:13px;color:#ff9ad1;white-space:pre-wrap}
+video{width:100%;border-radius:14px;margin-top:20px}
 </style>
 </head>
 <body>
-<h2>🤖 GROK AI VIDEO</h2>
-<p class="small">Foto asli jadi video - prompt semaunya lu</p>
+<div class="header"><div class="logo">♡ HugGen</div><div>🔔 👤</div></div>
+<div class="tabs"><div class="tab active">Explore</div><div class="tab">Drama</div><div class="tab">Feeds</div><div class="tab">Collection</div></div>
+<h2 style="padding:0 20px">Create a kissing Video</h2>
+<p style="padding:0 20px;color:#aaa;font-size:13px">REAL MOTION, not zoom. Powered by Wan2.2 AI.</p>
 
-<div class="card">
-  <label>1. Upload Foto Asli</label>
-  <input type="file" id="img" accept="image/*" onchange="document.getElementById('preview').src=URL.createObjectURL(this.files[0]);document.getElementById('preview').style.display='block'">
-  <img id="preview">
-  
-  <label style="margin-top:12px;display:block">2. Tulis Prompt Semaunya (kayak Grok)</label>
-  <textarea id="prompt" rows="4" placeholder="Contoh: berjalan pelan sambil berpelukan hangat, lalu lari kecil bahagia, naik motor besar bersama">berjalan pelan lalu berpelukan hangat, tersenyum bahagia, realistis</textarea>
-  
-  <div style="display:flex;gap:8px;margin-top:10px">
-    <button style="background:#222;color:#fff;border:1px solid #333;font-size:12px" onclick="document.getElementById('prompt').value='berjalan pelan ke depan, natural'">🚶 Jalan</button>
-    <button style="background:#222;color:#fff;border:1px solid #333;font-size:12px" onclick="document.getElementById('prompt').value='saling mendekat lalu berpelukan erat, hangat'">🫂 Pelukan</button>
-    <button style="background:#222;color:#fff;border:1px solid #333;font-size:12px" onclick="document.getElementById('prompt').value='lari kencang lalu loncat naik motor besar hitam, ngebut'">🏍️ Motor</button>
-  </div>
-
-  <button onclick="generateGrok()">🚀 GENERATE VIDEO (GROK MODE)</button>
-  <p id="status" class="small"></p>
-  <video id="video" controls playsinline style="display:none"></video>
-  <a id="download" style="display:none" download="grok-video.mp4"><button>⬇️ DOWNLOAD VIDEO</button></a>
+<div class="card" onclick="document.getElementById('file').click()">
+  <div style="font-size:40px;color:#ff6ec7">↑</div>
+  <div style="color:#ff6ec7;font-weight:700">Upload Photo</div>
+  <div style="font-size:12px;color:#888">JPG, PNG - Max 10MB</div>
+  <img id="preview" style="max-width:100%;margin-top:15px;border-radius:12px;display:none">
+  <input type="file" id="file" accept="image/*">
 </div>
 
-<div class="card">
-  <b>Cara biar jadi APK Pribadi Unlimited:</b>
-  <p class="small">
-    1. Buka huggingface.co/spaces/Wan-AI/Wan2.1-I2V-14B-480P<br>
-    2. Klik Duplicate > Private > Duplicate (gratis)<br>
-    3. Ganti di kode atas: Client.connect("username-lu/nama-space-lu")<br>
-    4. Jadi deh Grok punya lu sendiri, unlimited!
-  </p>
+<div style="padding:0 20px">
+  <textarea id="prompt">Two people sharing a warm, loving hug, gentle motion, cozy, soft natural lighting, realistic movement, tender moment</textarea>
+  <div id="log">Status: Siap. Upload foto dulu lur.</div>
+  <button class="btn" id="gen">✨ Generate - REAL MOTION</button>
+  <video id="vid" controls style="display:none"></video>
+  <a id="dl" style="display:none" class="btn" href="#" download>Download Video MP4</a>
 </div>
+
+<script type="module">
+import { Client } from "https://cdn.jsdelivr.net/npm/@gradio/client/dist/index.js";
+let imageFile=null;
+const fileInput=document.getElementById('file');
+const preview=document.getElementById('preview');
+const log=document.getElementById('log');
+fileInput.onchange=e=>{
+  imageFile=e.target.files[0];
+  preview.src=URL.createObjectURL(imageFile);
+  preview.style.display='block';
+  log.textContent='Foto siap: '+imageFile.name+' - Klik Generate!';
+};
+document.getElementById('gen').onclick=async()=>{
+  if(!imageFile){alert('Upload foto dulu lur!');return;}
+  log.textContent='⏳ Connecting to Wan2.2 AI... bisa 1-2 menit awal';
+  try{
+    const app=await Client.connect("https://Wan-AI-Wan2.2-TI2V-5B.hf.space/");
+    log.textContent+='\n✓ Connected! Ngirim foto & bikin video gerak... 3-5 menit';
+    const result=await app.predict("/generate_video",[imageFile,document.getElementById('prompt').value,5,720,42]);
+    const videoData=result.data[0];
+    const videoUrl=videoData.url||videoData;
+    document.getElementById('vid').src=videoUrl;
+    document.getElementById('vid').style.display='block';
+    const dl=document.getElementById('dl');dl.href=videoUrl;dl.style.display='block';
+    log.textContent='✅ JADI LUR! VIDEO GERAK BENERAN, BUKAN ZOOM! Download di bawah.';
+  }catch(err){
+    log.textContent='⚠️ Space lagi penuh. BACKUP: Buka langsung https://huggingface.co/spaces/Wan-AI/Wan2.2-TI2V-5B upload foto lu disana - itu pasti gerak beneran!\nError:'+err.message;
+  }
+};
+</script>
 </body>
 </html>
